@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>커미션 요청 시스템 🎨</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #0f0f13;
+  color: white;
+  margin: 0;
+  padding: 20px;
+}
+
+h1 { margin-bottom: 10px; }
+
+.card {
+  background: #1c1c25;
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 15px;
+}
+
+input, button {
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  margin: 5px 0;
+}
+
+input {
+  width: 100%;
+}
+
+button {
+  cursor: pointer;
+  background: #4f7cff;
+  color: white;
+}
+
+button:hover {
+  opacity: 0.8;
+}
+
+.status {
+  font-weight: bold;
+}
+
+.small {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+img {
+  max-width: 100%;
+  border-radius: 10px;
+  margin-top: 10px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🎨 요청 & 커미션 시스템</h1>
+
+<!-- 👤 USER -->
+<div class="card">
+  <h3>👤 사용자</h3>
+  <input id="userId" placeholder="닉네임 입력"/>
+  <input id="prompt" placeholder="예: 파란 고양이 그려줘"/>
+  <button onclick="createRequest()">📩 요청 보내기</button>
+</div>
+
+<!-- 📋 LIST -->
+<div class="card">
+  <h3>📋 내 요청</h3>
+  <div id="list"></div>
+</div>
+
+<!-- 🔐 ADMIN -->
+<div class="card">
+  <h3>🔐 관리자 모드</h3>
+  <button onclick="loginAdmin()">관리자 로그인</button>
+  <div id="adminPanel" style="display:none;">
+    <h4>요청 관리 🎯</h4>
+    <div id="adminList"></div>
+  </div>
+</div>
+
+<!-- 🌍 TRANSLATION -->
+<div class="card">
+  <h3>🌍 번역 모드</h3>
+  <input id="textToTranslate" placeholder="번역할 문장"/>
+  <button onclick="translateText()">번역하기 🤖</button>
+  <p id="translated"></p>
+</div>
+
+<script>
+let requests = JSON.parse(localStorage.getItem("requests") || "[]");
+let admin = false;
+
+/* 📩 요청 생성 */
+function createRequest() {
+  const user = document.getElementById("userId").value;
+  const prompt = document.getElementById("prompt").value;
+
+  if (!user || !prompt) return alert("입력 필요!");
+
+  requests.push({
+    id: Date.now(),
+    user,
+    prompt,
+    status: "pending",
+    image: ""
+  });
+
+  save();
+  render();
+}
+
+/* 💾 저장 */
+function save() {
+  localStorage.setItem("requests", JSON.stringify(requests));
+}
+
+/* 📋 유저 리스트 */
+function render() {
+  const user = document.getElementById("userId").value;
+  const list = document.getElementById("list");
+
+  list.innerHTML = "";
+
+  requests.filter(r => r.user === user).forEach(r => {
+    list.innerHTML += `
+      <div class="card">
+        <div>📝 ${r.prompt}</div>
+        <div class="status">
+          ${
+            r.status === "pending" ? "⏳ 대기중" :
+            r.status === "drawing" ? "🎨 그리는 중" :
+            "✅ 완성"
+          }
+        </div>
+        ${r.image ? `<img src="${r.image}"/>` : ""}
+      </div>
+    `;
+  });
+
+  renderAdmin();
+}
+
+/* 🔐 관리자 로그인 */
+function loginAdmin() {
+  const pw = prompt("관리자 비밀번호 입력");
+
+  if (pw === "150809") {
+    admin = true;
+    document.getElementById("adminPanel").style.display = "block";
+    renderAdmin();
+  } else {
+    alert("비밀번호 틀림 ❌");
+  }
+}
+
+/* 🎯 관리자 패널 */
+function renderAdmin() {
+  if (!admin) return;
+
+  const adminList = document.getElementById("adminList");
+  adminList.innerHTML = "";
+
+  requests.forEach((r, i) => {
+    adminList.innerHTML += `
+      <div class="card">
+        <div>👤 ${r.user}</div>
+        <div>📝 ${r.prompt}</div>
+
+        <button onclick="setStatus(${i}, 'drawing')">🎨 그리는 중</button>
+        <button onclick="setStatus(${i}, 'done')">✅ 완료</button>
+
+        <input type="file" onchange="uploadImg(event, ${i})"/>
+      </div>
+    `;
+  });
+}
+
+/* 🔄 상태 변경 */
+function setStatus(i, status) {
+  requests[i].status = status;
+  save();
+  render();
+}
+
+/* 🖼 이미지 업로드 */
+function uploadImg(event, i) {
+  const file = event.target.files[0];
+  const reader = new FileReader();
+
+  reader.onload = function(e) {
+    requests[i].image = e.target.result;
+    requests[i].status = "done";
+    save();
+    render();
+  };
+
+  reader.readAsDataURL(file);
+}
+
+/* 🌍 번역 (무료 API 사용) */
+async function translateText() {
+  const text = document.getElementById("textToTranslate").value;
+
+  const res = await fetch(
+    `https://api.mymemory.translated.net/get?q=${text}&langpair=ko|en`
+  );
+
+  const data = await res.json();
+
+  document.getElementById("translated").innerText =
+    "👉 " + data.responseData.translatedText;
+}
+
+/* 초기 */
+render();
+</script>
+
+</body>
+</html>
