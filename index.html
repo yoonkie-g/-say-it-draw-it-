@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Request Board</title>
+
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+
+<body>
+
+
+<div class="app">
+
+
+<!-- 이름 입력 -->
+
+<div id="nameBox" class="card">
+
+<h2>👤 이름 입력</h2>
+
+<p>처음 한 번만 입력합니다.</p>
+
+<input 
+id="nameInput"
+placeholder="이름 입력">
+
+
+<button onclick="saveName()">
+저장
+</button>
+
+
+</div>
+
+
+
+
+<!-- 메인 화면 -->
+
+<div id="mainBox" style="display:none;">
+
+
+
+<header>
+
+<h1>Request Board</h1>
+
+
+<div class="menu">
+
+<span id="userText"></span>
+
+
+<button onclick="changeLanguage()">
+한글 / English
+</button>
+
+
+<button onclick="openAdmin()">
+🔐
+</button>
+
+
+</div>
+
+
+</header>
+
+
+
+
+
+<!-- 작성 -->
+
+<div class="card">
+
+
+<h2>✏️ Request 작성</h2>
+
+
+<input 
+id="title"
+placeholder="제목">
+
+
+<textarea
+id="content"
+placeholder="내용"></textarea>
+
+
+
+
+
+<h3>📏 크기</h3>
+
+
+<div class="size">
+
+<input 
+id="width"
+placeholder="가로 cm">
+
+
+<input 
+id="height"
+placeholder="세로 cm">
+
+
+</div>
+
+
+
+
+
+<!-- 이미지 -->
+
+<div 
+id="dropArea"
+class="upload">
+
+
+<p>🖼️ 이미지 추가</p>
+
+<p>
+파일 선택 또는 드래그
+</p>
+
+
+<input 
+type="file"
+id="imageInput"
+multiple
+accept="image/*">
+
+
+</div>
+
+
+
+
+<div id="preview"></div>
+
+
+
+
+
+<!-- 익명 -->
+
+<label>
+
+<input 
+type="checkbox"
+id="anonymous">
+
+👤 이름 없음
+
+</label>
+
+
+
+
+
+<!-- 비밀글 -->
+
+<label>
+
+<input 
+type="checkbox"
+id="secret">
+
+🔐 비밀글
+
+</label>
+
+
+
+
+
+<button onclick="addPost()">
+
+등록
+
+</button>
+
+
+
+</div>
+
+
+
+
+
+
+
+<!-- 게시판 -->
+
+
+<h2>📋 게시판</h2>
+
+
+<div id="postList"></div>
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+<!-- 관리자 -->
+
+
+<div 
+id="adminBox"
+class="card"
+style="display:none;">
+
+
+<h2>🔐 관리자</h2>
+
+
+<input
+type="password"
+id="adminPassword"
+placeholder="관리자 비밀번호">
+
+
+<button onclick="loginAdmin()">
+
+확인
+
+</button>
+
+
+
+</div>
+
+
+
+
+
+</div>
+
+
+
+<script src="script.js"></script>
+
+
+</body>
+
+</html>
